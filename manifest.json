@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "WorkNest",
+  "version": "0.1.0",
+  "description": "Organize browser tabs into workspaces, save sessions, and resume work later.",
+  "action": {
+    "default_popup": "src/popup/index.html"
+  },
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "permissions": [
+    "tabs",
+    "storage"
+  ],
+  "icons": {
+    "16": "src/assets/icons/icon16.png",
+    "48": "src/assets/icons/icon48.png",
+    "128": "src/assets/icons/icon128.png"
+  }
+}

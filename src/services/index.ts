@@ -1,0 +1,1 @@
+export { getAllTabs } from './tabsService'
