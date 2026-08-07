@@ -1,4 +1,4 @@
-export { getAllTabs } from './tabsService'
+export { getAllTabs, closeTab } from './tabsService'
 export { getWorkspaces, setWorkspaces } from './storageService'
 export {
   createWorkspace,

@@ -16,3 +16,10 @@ export async function getAllTabs(): Promise<Tab[]> {
       index: tab.index,
     }))
 }
+
+/**
+ * Closes a single browser tab by id.
+ */
+export async function closeTab(tabId: number): Promise<void> {
+  await chrome.tabs.remove(tabId)
+}

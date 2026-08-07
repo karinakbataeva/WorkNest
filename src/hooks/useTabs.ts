@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getAllTabs } from '../services'
+import { getAllTabs, closeTab } from '../services'
 import type { Tab } from '../types'
 
 interface UseTabsResult {
@@ -7,6 +7,7 @@ interface UseTabsResult {
   isLoading: boolean
   error: string | null
   refresh: () => void
+  closeTab: (tabId: number) => Promise<void>
 }
 
 export function useTabs(): UseTabsResult {
@@ -49,5 +50,10 @@ export function useTabs(): UseTabsResult {
     }
   }, [refreshKey])
 
-  return { tabs, isLoading, error, refresh }
+  const handleCloseTab = useCallback(async (tabId: number) => {
+    await closeTab(tabId)
+    setTabs((prev) => prev.filter((tab) => tab.id !== tabId))
+  }, [])
+
+  return { tabs, isLoading, error, refresh, closeTab: handleCloseTab }
 }
