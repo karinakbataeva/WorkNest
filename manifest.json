@@ -11,6 +11,15 @@
     "type": "module"
   },
   "permissions": ["tabs", "storage", "alarms", "notifications", "offscreen"],
+  "commands": {
+    "quick-save-workspace": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Command+Shift+S"
+      },
+      "description": "Save current tabs as a new workspace"
+    }
+  },
   "icons": {
     "16": "src/assets/icons/icon16.png",
     "48": "src/assets/icons/icon48.png",

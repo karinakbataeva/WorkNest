@@ -1,6 +1,7 @@
 import { FOCUS_ALARM_NAME } from '../services/focusService'
 import { getFocusSession, setFocusSession } from '../services/storageService'
 import { playNotificationSound } from '../services/audioService'
+import { quickSaveCurrentTabs } from '../services/workspaceService'
 
 console.log('WorkNest background service worker initialized')
 
@@ -38,5 +39,27 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
       message: 'Ready to start another focus session?',
     })
     await playNotificationSound()
+  }
+})
+
+chrome.commands.onCommand.addListener(async (command) => {
+  if (command !== 'quick-save-workspace') return
+
+  try {
+    const workspace = await quickSaveCurrentTabs()
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'src/assets/icons/icon128.png',
+      title: 'Workspace saved',
+      message: `Saved "${workspace.name}" with ${workspace.tabs.length} tabs.`,
+    })
+  } catch (err) {
+    console.error('Quick-save failed:', err)
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'src/assets/icons/icon128.png',
+      title: 'Save failed',
+      message: 'Could not save workspace. Please try again.',
+    })
   }
 })

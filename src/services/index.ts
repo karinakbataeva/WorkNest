@@ -2,6 +2,7 @@ export { getAllTabs, closeTab } from './tabsService'
 export { getWorkspaces, setWorkspaces, getTheme, setTheme } from './storageService'
 export {
   createWorkspace,
+  quickSaveCurrentTabs,
   restoreWorkspace,
   renameWorkspace,
   deleteWorkspace,

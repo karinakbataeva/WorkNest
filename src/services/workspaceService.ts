@@ -1,5 +1,6 @@
 import type { Tab, Workspace } from '../types'
 import { getWorkspaces, setWorkspaces } from './storageService'
+import { getAllTabs } from './tabsService'
 
 export async function createWorkspace(name: string, tabs: Tab[]): Promise<Workspace> {
   const now = Date.now()
@@ -18,8 +19,28 @@ export async function createWorkspace(name: string, tabs: Tab[]): Promise<Worksp
 }
 
 /**
- * Opens every tab in a workspace inside a brand new browser window.
+ * Generates a readable default name like "Workspace — Aug 7, 5:45 PM".
  */
+function generateTimestampName(): string {
+  const formatted = new Date().toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+  return `Workspace — ${formatted}`
+}
+
+/**
+ * Captures ALL current open tabs and saves them as a new workspace,
+ * with an auto-generated timestamp name. Used by the quick-save
+ * keyboard shortcut, which has no UI to collect a custom name.
+ */
+export async function quickSaveCurrentTabs(): Promise<Workspace> {
+  const tabs = await getAllTabs()
+  return createWorkspace(generateTimestampName(), tabs)
+}
+
 export async function restoreWorkspace(workspace: Workspace): Promise<void> {
   if (workspace.tabs.length === 0) return
 
@@ -38,9 +59,6 @@ export async function restoreWorkspace(workspace: Workspace): Promise<void> {
   }
 }
 
-/**
- * Renames a workspace by id and persists the change.
- */
 export async function renameWorkspace(id: string, newName: string): Promise<void> {
   const trimmed = newName.trim()
   if (!trimmed) return
@@ -52,9 +70,6 @@ export async function renameWorkspace(id: string, newName: string): Promise<void
   await setWorkspaces(updated)
 }
 
-/**
- * Deletes a workspace by id and persists the change.
- */
 export async function deleteWorkspace(id: string): Promise<void> {
   const existing = await getWorkspaces()
   const updated = existing.filter((ws) => ws.id !== id)
