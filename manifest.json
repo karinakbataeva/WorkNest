@@ -10,10 +10,7 @@
     "service_worker": "src/background/index.ts",
     "type": "module"
   },
-  "permissions": [
-    "tabs",
-    "storage"
-  ],
+  "permissions": ["tabs", "storage", "alarms", "notifications"],
   "icons": {
     "16": "src/assets/icons/icon16.png",
     "48": "src/assets/icons/icon48.png",

@@ -1,17 +1,25 @@
 import { useState } from 'react'
-import { FolderOpen, Pencil, Trash2, Check, X } from 'lucide-react'
+import { FolderOpen, Pencil, Trash2, Check, X, AlertTriangle } from 'lucide-react'
 import type { Workspace } from '../types'
 
 interface WorkspaceItemProps {
   workspace: Workspace
+  focusActive: boolean
   onRestore: (workspace: Workspace) => void
   onRename: (id: string, newName: string) => void
   onDelete: (id: string) => void
 }
 
-export function WorkspaceItem({ workspace, onRestore, onRename, onDelete }: WorkspaceItemProps) {
+export function WorkspaceItem({
+  workspace,
+  focusActive,
+  onRestore,
+  onRename,
+  onDelete,
+}: WorkspaceItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [draftName, setDraftName] = useState(workspace.name)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   function handleConfirmRename() {
     if (draftName.trim() && draftName.trim() !== workspace.name) {
@@ -23,6 +31,14 @@ export function WorkspaceItem({ workspace, onRestore, onRename, onDelete }: Work
   function handleCancelRename() {
     setDraftName(workspace.name)
     setIsEditing(false)
+  }
+
+  function handleRestoreClick() {
+    if (focusActive) {
+      setShowConfirm(true)
+    } else {
+      onRestore(workspace)
+    }
   }
 
   if (isEditing) {
@@ -57,10 +73,40 @@ export function WorkspaceItem({ workspace, onRestore, onRename, onDelete }: Work
     )
   }
 
+  if (showConfirm) {
+    return (
+      <div className="flex flex-col gap-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 px-3 py-2">
+        <div className="flex items-center gap-1.5">
+          <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-amber-500" />
+          <p className="text-xs text-amber-800 dark:text-amber-300">
+            Focus session active. Restore this workspace anyway?
+          </p>
+        </div>
+        <div className="flex gap-1.5">
+          <button
+            onClick={() => {
+              onRestore(workspace)
+              setShowConfirm(false)
+            }}
+            className="rounded-md bg-amber-600 hover:bg-amber-700 px-2 py-1 text-xs font-medium text-white transition-colors"
+          >
+            Restore anyway
+          </button>
+          <button
+            onClick={() => setShowConfirm(false)}
+            className="rounded-md border border-amber-300 dark:border-amber-800 px-2 py-1 text-xs font-medium text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="group flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
       <button
-        onClick={() => onRestore(workspace)}
+        onClick={handleRestoreClick}
         className="flex min-w-0 flex-1 items-center gap-3 text-left"
       >
         <FolderOpen className="w-4 h-4 shrink-0 text-blue-500 dark:text-blue-400" />

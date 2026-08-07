@@ -3,12 +3,19 @@ import { WorkspaceItem } from './WorkspaceItem'
 
 interface WorkspaceListProps {
   workspaces: Workspace[]
+  focusActive: boolean
   onRestore: (workspace: Workspace) => void
   onRename: (id: string, newName: string) => void
   onDelete: (id: string) => void
 }
 
-export function WorkspaceList({ workspaces, onRestore, onRename, onDelete }: WorkspaceListProps) {
+export function WorkspaceList({
+  workspaces,
+  focusActive,
+  onRestore,
+  onRename,
+  onDelete,
+}: WorkspaceListProps) {
   if (workspaces.length === 0) return null
 
   return (
@@ -20,6 +27,7 @@ export function WorkspaceList({ workspaces, onRestore, onRename, onDelete }: Wor
         <WorkspaceItem
           key={workspace.id}
           workspace={workspace}
+          focusActive={focusActive}
           onRestore={onRestore}
           onRename={onRename}
           onDelete={onDelete}
