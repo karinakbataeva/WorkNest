@@ -27,7 +27,7 @@ export default function App() {
   }, [workspaces, searchQuery])
 
   return (
-    <div className="w-[360px] max-h-[600px] overflow-y-auto bg-white dark:bg-gray-900">
+    <div className="w-[360px] h-[600px] overflow-y-auto bg-white dark:bg-gray-900">
       <header className="flex items-center justify-between px-3 py-2.5 border-b border-gray-100 dark:border-gray-800">
         <h1 className="text-sm font-semibold text-gray-900 dark:text-gray-100">WorkNest</h1>
         <ThemeToggle theme={theme} onChange={setTheme} />

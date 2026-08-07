@@ -9,6 +9,7 @@ const DEFAULT_FOCUS_SESSION: FocusSessionState = {
   endTime: null,
   focusMinutes: 25,
   breakMinutes: 5,
+  breakCount: 0,
 }
 
 export async function getWorkspaces(): Promise<Workspace[]> {

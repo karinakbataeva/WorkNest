@@ -86,7 +86,7 @@ export function FocusSessionCard({
           />
           <div>
             <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              {isFocusPhase ? 'Focus time' : 'Break time'}
+              {isFocusPhase ? 'Focus time' : `Break ${session.breakCount}`}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400 tabular-nums">
               {formatTime(remainingSeconds)} remaining

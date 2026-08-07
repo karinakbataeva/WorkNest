@@ -17,11 +17,10 @@ export function useFocusSession(): UseFocusSessionResult {
     endTime: null,
     focusMinutes: 25,
     breakMinutes: 5,
+    breakCount: 0,
   })
   const [remainingSeconds, setRemainingSeconds] = useState(0)
 
-  // Load initial state, and stay in sync if storage changes
-  // (e.g. the background worker flips phase while popup is closed/reopened).
   useEffect(() => {
     let cancelled = false
 
@@ -43,8 +42,6 @@ export function useFocusSession(): UseFocusSessionResult {
     }
   }, [])
 
-  // Local ticking clock, purely for display -- recalculated from endTime each tick
-  // so it's always accurate even after the popup was closed and reopened.
   useEffect(() => {
     if (!session.endTime) {
       setRemainingSeconds(0)

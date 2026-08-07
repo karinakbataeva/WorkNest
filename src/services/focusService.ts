@@ -3,10 +3,6 @@ import { getFocusSession, setFocusSession } from './storageService'
 
 export const FOCUS_ALARM_NAME = 'worknest-focus-alarm'
 
-/**
- * Starts a new focus session: sets phase to 'focus', schedules an alarm
- * to fire when it ends, and persists the state.
- */
 export async function startFocusSession(
   focusMinutes: number,
   breakMinutes: number
@@ -18,6 +14,7 @@ export async function startFocusSession(
     endTime,
     focusMinutes,
     breakMinutes,
+    breakCount: 0,
   }
 
   await setFocusSession(newState)
@@ -26,9 +23,6 @@ export async function startFocusSession(
   return newState
 }
 
-/**
- * Cancels the active session entirely, clearing the alarm and resetting to idle.
- */
 export async function cancelFocusSession(): Promise<FocusSessionState> {
   await chrome.alarms.clear(FOCUS_ALARM_NAME)
 
@@ -38,6 +32,7 @@ export async function cancelFocusSession(): Promise<FocusSessionState> {
     endTime: null,
     focusMinutes: current.focusMinutes,
     breakMinutes: current.breakMinutes,
+    breakCount: 0,
   }
 
   await setFocusSession(newState)

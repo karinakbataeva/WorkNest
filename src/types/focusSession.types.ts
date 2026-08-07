@@ -5,4 +5,5 @@ export interface FocusSessionState {
   endTime: number | null
   focusMinutes: number
   breakMinutes: number
+  breakCount: number
 }
