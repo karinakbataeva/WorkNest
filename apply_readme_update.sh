@@ -1,3 +1,6 @@
+cd .
+
+cat > README.md << 'WORKNEST_EOF'
 # WorkNest
 
 A Chrome extension for managing tab overload — organize open tabs into named workspaces, save sessions, resume work later, and stay focused with built-in Pomodoro-style focus sessions.
@@ -119,3 +122,6 @@ npm run build          # production build
 | `alarms` | Background-persistent focus session timing |
 | `notifications` | Alert the user when a focus/break phase ends |
 | `offscreen` | Play a notification sound from the background context |
+WORKNEST_EOF
+
+echo "README updated."
