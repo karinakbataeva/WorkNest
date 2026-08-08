@@ -2,9 +2,11 @@ import { useCallback, useEffect, useState } from 'react'
 import { getWorkspaces } from '../services'
 import {
   createWorkspace,
+  createEmptyWorkspace,
   restoreWorkspace,
   renameWorkspace,
   deleteWorkspace,
+  addTabsToWorkspace,
 } from '../services/workspaceService'
 import type { Tab, Workspace } from '../types'
 
@@ -14,9 +16,12 @@ interface UseWorkspacesResult {
   error: string | null
   isSaving: boolean
   saveWorkspace: (name: string, tabs: Tab[]) => Promise<void>
+  createEmpty: (name: string) => Promise<void>
   restore: (workspace: Workspace) => Promise<void>
   rename: (id: string, newName: string) => Promise<void>
   remove: (id: string) => Promise<void>
+  addToWorkspace: (workspaceId: string, tabs: Tab[]) => Promise<number>
+  refresh: () => Promise<void>
 }
 
 export function useWorkspaces(): UseWorkspacesResult {
@@ -25,28 +30,21 @@ export function useWorkspaces(): UseWorkspacesResult {
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    let cancelled = false
-
-    async function load() {
-      setIsLoading(true)
-      try {
-        const result = await getWorkspaces()
-        if (!cancelled) setWorkspacesState(result)
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to load workspaces')
-        }
-      } finally {
-        if (!cancelled) setIsLoading(false)
-      }
-    }
-
-    load()
-    return () => {
-      cancelled = true
+  const load = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const result = await getWorkspaces()
+      setWorkspacesState(result)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load workspaces')
+    } finally {
+      setIsLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
 
   const saveWorkspace = useCallback(async (name: string, tabs: Tab[]) => {
     setIsSaving(true)
@@ -56,6 +54,20 @@ export function useWorkspaces(): UseWorkspacesResult {
       setWorkspacesState((prev) => [...prev, newWorkspace])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save workspace')
+      throw err
+    } finally {
+      setIsSaving(false)
+    }
+  }, [])
+
+  const createEmpty = useCallback(async (name: string) => {
+    setIsSaving(true)
+    setError(null)
+    try {
+      const newWorkspace = await createEmptyWorkspace(name)
+      setWorkspacesState((prev) => [...prev, newWorkspace])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create workspace')
       throw err
     } finally {
       setIsSaving(false)
@@ -93,5 +105,28 @@ export function useWorkspaces(): UseWorkspacesResult {
     }
   }, [])
 
-  return { workspaces, isLoading, error, isSaving, saveWorkspace, restore, rename, remove }
+  const addToWorkspace = useCallback(async (workspaceId: string, tabs: Tab[]) => {
+    try {
+      const addedCount = await addTabsToWorkspace(workspaceId, tabs)
+      await load()
+      return addedCount
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add tabs to workspace')
+      throw err
+    }
+  }, [load])
+
+  return {
+    workspaces,
+    isLoading,
+    error,
+    isSaving,
+    saveWorkspace,
+    createEmpty,
+    restore,
+    rename,
+    remove,
+    addToWorkspace,
+    refresh: load,
+  }
 }

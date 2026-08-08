@@ -1,14 +1,16 @@
 import { useMemo } from 'react'
-import type { Tab } from '../types'
+import type { Tab, Workspace } from '../types'
 import { getDuplicateTabIds } from '../utils/duplicateTabs'
 import { TabItem } from './TabItem'
 
 interface TabListProps {
   tabs: Tab[]
   onCloseTab?: (tabId: number) => void
+  workspaces?: Workspace[]
+  onAddToWorkspace?: (workspaceId: string, tab: Tab) => void
 }
 
-export function TabList({ tabs, onCloseTab }: TabListProps) {
+export function TabList({ tabs, onCloseTab, workspaces, onAddToWorkspace }: TabListProps) {
   const duplicateIds = useMemo(() => getDuplicateTabIds(tabs), [tabs])
 
   return (
@@ -19,6 +21,8 @@ export function TabList({ tabs, onCloseTab }: TabListProps) {
           tab={tab}
           isDuplicate={duplicateIds.has(tab.id)}
           onClose={onCloseTab}
+          workspaces={workspaces}
+          onAddToWorkspace={onAddToWorkspace}
         />
       ))}
     </div>

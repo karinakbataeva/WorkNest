@@ -1,20 +1,18 @@
 import { useState } from 'react'
-import { Save, Check, X } from 'lucide-react'
-import type { Tab } from '../types'
+import { Plus, Check, X } from 'lucide-react'
 
 interface SaveWorkspaceButtonProps {
-  tabs: Tab[]
-  onSave: (name: string, tabs: Tab[]) => Promise<void>
+  onCreate: (name: string) => Promise<void>
   isSaving: boolean
 }
 
-export function SaveWorkspaceButton({ tabs, onSave, isSaving }: SaveWorkspaceButtonProps) {
+export function SaveWorkspaceButton({ onCreate, isSaving }: SaveWorkspaceButtonProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [name, setName] = useState('')
 
   async function handleConfirm() {
     if (!name.trim()) return
-    await onSave(name, tabs)
+    await onCreate(name)
     setName('')
     setIsEditing(false)
   }
@@ -43,7 +41,7 @@ export function SaveWorkspaceButton({ tabs, onSave, isSaving }: SaveWorkspaceBut
           onClick={handleConfirm}
           disabled={isSaving || !name.trim()}
           className="rounded-md p-1.5 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 disabled:opacity-40 transition-colors"
-          aria-label="Confirm save"
+          aria-label="Confirm create"
         >
           <Check className="w-4 h-4" />
         </button>
@@ -62,11 +60,10 @@ export function SaveWorkspaceButton({ tabs, onSave, isSaving }: SaveWorkspaceBut
   return (
     <button
       onClick={() => setIsEditing(true)}
-      disabled={tabs.length === 0}
-      className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 transition-colors"
+      className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
     >
-      <Save className="w-4 h-4" />
-      Save as Workspace
+      <Plus className="w-4 h-4" />
+      Add a new workspace
     </button>
   )
 }

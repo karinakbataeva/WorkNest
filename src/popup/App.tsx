@@ -15,14 +15,18 @@ import { SearchInput } from '../components/SearchInput'
 import { ThemeToggle } from '../components/ThemeToggle'
 import { FocusSessionCard } from '../components/FocusSessionCard'
 import { HistoryView } from '../components/HistoryView'
+import type { Tab } from '../types'
+
+type View = 'main' | 'history'
 
 export default function App() {
   const { tabs, isLoading, error, refresh, closeTab } = useTabs()
-  const { workspaces, saveWorkspace, isSaving, restore, rename, remove } = useWorkspaces()
+  const { workspaces, createEmpty, isSaving, restore, rename, remove, addToWorkspace } =
+    useWorkspaces()
   const { theme, setTheme } = useTheme()
   const { session, remainingSeconds, isActive, start, cancel } = useFocusSession()
   const [searchQuery, setSearchQuery] = useState('')
-  const [view, setView] = useState<'main' | 'history'>('main')
+  const [view, setView] = useState<View>('main')
   const { history, isLoading: historyLoading } = useHistory(view === 'history')
 
   const filteredWorkspaces = useMemo(() => {
@@ -30,6 +34,10 @@ export default function App() {
     const query = searchQuery.trim().toLowerCase()
     return workspaces.filter((ws) => ws.name.toLowerCase().includes(query))
   }, [workspaces, searchQuery])
+
+  function handleAddSingleTab(workspaceId: string, tab: Tab) {
+    addToWorkspace(workspaceId, [tab])
+  }
 
   if (view === 'history') {
     return (
@@ -61,7 +69,7 @@ export default function App() {
           onCancel={cancel}
         />
 
-        <SaveWorkspaceButton tabs={tabs} onSave={saveWorkspace} isSaving={isSaving} />
+        <SaveWorkspaceButton onCreate={createEmpty} isSaving={isSaving} />
 
         {workspaces.length > 0 && (
           <div className="pt-1 pb-0.5">
@@ -91,7 +99,12 @@ export default function App() {
         {!isLoading && error && <ErrorState message={error} onRetry={refresh} />}
         {!isLoading && !error && tabs.length === 0 && <EmptyState />}
         {!isLoading && !error && tabs.length > 0 && (
-          <TabList tabs={tabs} onCloseTab={closeTab} />
+          <TabList
+            tabs={tabs}
+            onCloseTab={closeTab}
+            workspaces={workspaces}
+            onAddToWorkspace={handleAddSingleTab}
+          />
         )}
       </div>
     </div>

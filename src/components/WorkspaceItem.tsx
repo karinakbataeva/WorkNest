@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { FolderOpen, Pencil, Trash2, Check, X, AlertTriangle } from 'lucide-react'
 import type { Workspace } from '../types'
+import { WorkspacePreview } from './WorkspacePreview'
 
 interface WorkspaceItemProps {
   workspace: Workspace
@@ -20,6 +21,7 @@ export function WorkspaceItem({
   const [isEditing, setIsEditing] = useState(false)
   const [draftName, setDraftName] = useState(workspace.name)
   const [showConfirm, setShowConfirm] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
 
   function handleConfirmRename() {
     if (draftName.trim() && draftName.trim() !== workspace.name) {
@@ -104,7 +106,11 @@ export function WorkspaceItem({
   }
 
   return (
-    <div className="group flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+    <div
+      className="group relative flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <button
         onClick={handleRestoreClick}
         className="flex min-w-0 flex-1 items-center gap-3 text-left"
@@ -115,7 +121,7 @@ export function WorkspaceItem({
             {workspace.name}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            {workspace.tabs.length} {workspace.tabs.length === 1 ? 'tab' : 'tabs'}
+            {workspace.tabs.length}{workspace.tabs.length === 1 ? 'tab' : 'tabs'}
           </p>
         </div>
       </button>
@@ -136,6 +142,8 @@ export function WorkspaceItem({
           <Trash2 className="w-3.5 h-3.5" />
         </button>
       </div>
+
+      {isHovered && <WorkspacePreview workspace={workspace} />}
     </div>
   )
 }

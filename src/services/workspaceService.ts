@@ -20,6 +20,14 @@ export async function createWorkspace(name: string, tabs: Tab[]): Promise<Worksp
   return newWorkspace
 }
 
+/**
+ * Creates a new, empty workspace with no tabs -- the user adds tabs to it
+ * afterward via the per-tab "add to workspace" action.
+ */
+export async function createEmptyWorkspace(name: string): Promise<Workspace> {
+  return createWorkspace(name, [])
+}
+
 function generateTimestampName(): string {
   const formatted = new Date().toLocaleString('en-US', {
     month: 'short',
@@ -33,6 +41,27 @@ function generateTimestampName(): string {
 export async function quickSaveCurrentTabs(): Promise<Workspace> {
   const tabs = await getAllTabs()
   return createWorkspace(generateTimestampName(), tabs)
+}
+
+export async function addTabsToWorkspace(
+  workspaceId: string,
+  tabsToAdd: Tab[]
+): Promise<number> {
+  const existing = await getWorkspaces()
+  const workspace = existing.find((ws) => ws.id === workspaceId)
+  if (!workspace) throw new Error('Workspace not found')
+
+  const existingUrls = new Set(workspace.tabs.map((t) => t.url))
+  const newTabs = tabsToAdd.filter((t) => !existingUrls.has(t.url))
+
+  const updated = existing.map((ws) =>
+    ws.id === workspaceId
+      ? { ...ws, tabs: [...ws.tabs, ...newTabs], updatedAt: Date.now() }
+      : ws
+  )
+
+  await setWorkspaces(updated)
+  return newTabs.length
 }
 
 export async function restoreWorkspace(workspace: Workspace): Promise<void> {
