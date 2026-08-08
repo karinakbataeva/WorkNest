@@ -7,6 +7,7 @@ import {
   renameWorkspace,
   deleteWorkspace,
   addTabsToWorkspace,
+  updateWorkspaceNote,
 } from '../services/workspaceService'
 import type { Tab, Workspace } from '../types'
 
@@ -20,6 +21,7 @@ interface UseWorkspacesResult {
   restore: (workspace: Workspace) => Promise<void>
   rename: (id: string, newName: string) => Promise<void>
   remove: (id: string) => Promise<void>
+  updateNote: (id: string, note: string) => Promise<void>
   addToWorkspace: (workspaceId: string, tabs: Tab[]) => Promise<number>
   refresh: () => Promise<void>
 }
@@ -95,6 +97,21 @@ export function useWorkspaces(): UseWorkspacesResult {
     }
   }, [])
 
+  const updateNote = useCallback(async (id: string, note: string) => {
+    try {
+      await updateWorkspaceNote(id, note)
+      const trimmed = note.trim()
+      setWorkspacesState((prev) =>
+        prev.map((ws) =>
+          ws.id === id ? { ...ws, note: trimmed || undefined, updatedAt: Date.now() } : ws
+        )
+      )
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save note')
+      throw err
+    }
+  }, [])
+
   const remove = useCallback(async (id: string) => {
     try {
       await deleteWorkspace(id)
@@ -126,6 +143,7 @@ export function useWorkspaces(): UseWorkspacesResult {
     restore,
     rename,
     remove,
+    updateNote,
     addToWorkspace,
     refresh: load,
   }

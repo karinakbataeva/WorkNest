@@ -21,8 +21,16 @@ type View = 'main' | 'history'
 
 export default function App() {
   const { tabs, isLoading, error, refresh, closeTab } = useTabs()
-  const { workspaces, createEmpty, isSaving, restore, rename, remove, addToWorkspace } =
-    useWorkspaces()
+  const {
+    workspaces,
+    createEmpty,
+    isSaving,
+    restore,
+    rename,
+    remove,
+    updateNote,
+    addToWorkspace,
+  } = useWorkspaces()
   const { theme, setTheme } = useTheme()
   const { session, remainingSeconds, isActive, start, cancel } = useFocusSession()
   const [searchQuery, setSearchQuery] = useState('')
@@ -87,6 +95,7 @@ export default function App() {
           onRestore={restore}
           onRename={rename}
           onDelete={remove}
+          onUpdateNote={updateNote}
         />
 
         <div className="my-1 border-t border-gray-100 dark:border-gray-800" />

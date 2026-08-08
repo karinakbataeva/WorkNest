@@ -4,6 +4,7 @@ export interface Workspace {
   id: string
   name: string
   tabs: Tab[]
+  note?: string
   createdAt: number
   updatedAt: number
 }

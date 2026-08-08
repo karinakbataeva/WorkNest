@@ -95,6 +95,16 @@ export async function renameWorkspace(id: string, newName: string): Promise<void
   await setWorkspaces(updated)
 }
 
+export async function updateWorkspaceNote(id: string, note: string): Promise<void> {
+  const trimmed = note.trim()
+
+  const existing = await getWorkspaces()
+  const updated = existing.map((ws) =>
+    ws.id === id ? { ...ws, note: trimmed || undefined, updatedAt: Date.now() } : ws
+  )
+  await setWorkspaces(updated)
+}
+
 export async function deleteWorkspace(id: string): Promise<void> {
   const existing = await getWorkspaces()
   const updated = existing.filter((ws) => ws.id !== id)

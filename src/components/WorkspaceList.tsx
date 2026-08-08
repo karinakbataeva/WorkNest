@@ -7,6 +7,7 @@ interface WorkspaceListProps {
   onRestore: (workspace: Workspace) => void
   onRename: (id: string, newName: string) => void
   onDelete: (id: string) => void
+  onUpdateNote: (id: string, note: string) => void
 }
 
 export function WorkspaceList({
@@ -15,6 +16,7 @@ export function WorkspaceList({
   onRestore,
   onRename,
   onDelete,
+  onUpdateNote,
 }: WorkspaceListProps) {
   if (workspaces.length === 0) return null
 
@@ -31,6 +33,7 @@ export function WorkspaceList({
           onRestore={onRestore}
           onRename={onRename}
           onDelete={onDelete}
+          onUpdateNote={onUpdateNote}
         />
       ))}
     </div>
