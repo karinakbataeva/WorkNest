@@ -1,8 +1,11 @@
-import type { FocusSessionState, Theme, Workspace } from '../types'
+import type { FocusSessionState, HistoryEntry, Theme, Workspace } from '../types'
 
 const WORKSPACES_KEY = 'worknest_workspaces'
 const THEME_KEY = 'worknest_theme'
 const FOCUS_SESSION_KEY = 'worknest_focus_session'
+const HISTORY_KEY = 'worknest_history'
+
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000
 
 const DEFAULT_FOCUS_SESSION: FocusSessionState = {
   phase: 'idle',
@@ -40,4 +43,29 @@ export async function getFocusSession(): Promise<FocusSessionState> {
 
 export async function setFocusSession(session: FocusSessionState): Promise<void> {
   await chrome.storage.local.set({ [FOCUS_SESSION_KEY]: session })
+}
+
+/**
+ * Reads history entries, silently dropping anything older than 30 days.
+ * The trimmed result is written back so storage doesn't grow unbounded.
+ */
+export async function getHistory(): Promise<HistoryEntry[]> {
+  const result = await chrome.storage.local.get(HISTORY_KEY)
+  const raw = result[HISTORY_KEY]
+  const entries: HistoryEntry[] = Array.isArray(raw) ? raw : []
+
+  const cutoff = Date.now() - THIRTY_DAYS_MS
+  const trimmed = entries.filter((entry) => entry.timestamp >= cutoff)
+
+  if (trimmed.length !== entries.length) {
+    await chrome.storage.local.set({ [HISTORY_KEY]: trimmed })
+  }
+
+  return trimmed
+}
+
+export async function addHistoryEntry(entry: HistoryEntry): Promise<void> {
+  const existing = await getHistory()
+  const updated = [entry, ...existing]
+  await chrome.storage.local.set({ [HISTORY_KEY]: updated })
 }

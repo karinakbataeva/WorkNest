@@ -1,6 +1,7 @@
 import type { Tab, Workspace } from '../types'
 import { getWorkspaces, setWorkspaces } from './storageService'
 import { getAllTabs } from './tabsService'
+import { logHistoryEvent } from './historyService'
 
 export async function createWorkspace(name: string, tabs: Tab[]): Promise<Workspace> {
   const now = Date.now()
@@ -14,13 +15,11 @@ export async function createWorkspace(name: string, tabs: Tab[]): Promise<Worksp
 
   const existing = await getWorkspaces()
   await setWorkspaces([...existing, newWorkspace])
+  await logHistoryEvent(newWorkspace.name, 'saved')
 
   return newWorkspace
 }
 
-/**
- * Generates a readable default name like "Workspace — Aug 7, 5:45 PM".
- */
 function generateTimestampName(): string {
   const formatted = new Date().toLocaleString('en-US', {
     month: 'short',
@@ -31,11 +30,6 @@ function generateTimestampName(): string {
   return `Workspace — ${formatted}`
 }
 
-/**
- * Captures ALL current open tabs and saves them as a new workspace,
- * with an auto-generated timestamp name. Used by the quick-save
- * keyboard shortcut, which has no UI to collect a custom name.
- */
 export async function quickSaveCurrentTabs(): Promise<Workspace> {
   const tabs = await getAllTabs()
   return createWorkspace(generateTimestampName(), tabs)
@@ -57,6 +51,8 @@ export async function restoreWorkspace(workspace: Workspace): Promise<void> {
   for (const tab of restTabs) {
     await chrome.tabs.create({ windowId, url: tab.url, active: false })
   }
+
+  await logHistoryEvent(workspace.name, 'restored')
 }
 
 export async function renameWorkspace(id: string, newName: string): Promise<void> {
